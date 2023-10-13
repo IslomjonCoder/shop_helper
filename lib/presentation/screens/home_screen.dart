@@ -56,6 +56,7 @@ class HomeScreen extends StatelessWidget {
                   return Center(
                       child: Text(
                     'Error loading products: ${state.error}',
+                    textAlign: TextAlign.center,
                     style: context.titleLarge,
                   ));
                 } else {

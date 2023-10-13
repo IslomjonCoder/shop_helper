@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:shop_helper/business_logic/blocs/product_bloc.dart';
 import 'package:shop_helper/data/service/local/database_helper.dart';
@@ -51,22 +52,34 @@ class _SaleProductScreenState extends State<SaleProductScreen> {
       appBar: AppBar(title: const Text('Sale Products')),
       body: Stack(
         children: [
-          QRView(
-            overlay: QrScannerOverlayShape(),
-            key: qrKey,
-            onQRViewCreated: (QRViewController controller) {
-              this.controller = controller;
-              // controller.toggleFlash();
-              controller.scannedDataStream.listen((scanData) async {
-                if (scanData.code != null) {
-                  await controller.stopCamera();
-                  context.read<ProductBloc>().add(SaleProductEvent(scanData.code!));
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(const SnackBar(content: Text('Product Sold')));
-                  Navigator.of(context).pop();
-                }
-              });
+          BlocListener<ProductBloc, ProductState>(
+            listener: (context, state) async {
+              print(state);
+              if (state is ProductErrorState) {
+                Fluttertoast.showToast(msg: 'Product not found!');
+                await Future.delayed(const Duration(milliseconds: 600), () {
+                  controller?.resumeCamera();
+                });
+              } else if (state is ProductLoadedState) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(const SnackBar(content: Text('Product Sold')));
+                Navigator.of(context).pop();
+              }
             },
+            child: QRView(
+              overlay: QrScannerOverlayShape(),
+              key: qrKey,
+              onQRViewCreated: (QRViewController controller) {
+                this.controller = controller;
+                // controller.toggleFlash();
+                controller.scannedDataStream.listen((scanData) async {
+                  if (scanData.code != null) {
+                    await controller.stopCamera();
+                    context.read<ProductBloc>().add(SaleProductEvent(scanData.code!));
+                  }
+                });
+              },
+            ),
           ),
           Center(child: Container())
         ],

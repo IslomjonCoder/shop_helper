@@ -107,6 +107,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       final product = await dbHelper.getProductByBarcode(event.barcode);
       if (product != null) {
         await _decreaseProductCount(event.barcode);
+        await _emitLoadedState();
       } else {
         emit(ProductErrorState("Product not found"));
       }
