@@ -1,3 +1,4 @@
+import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,10 +35,11 @@ class HomeScreen extends StatelessWidget {
                 if (state is ProductLoadedState) {
                   // Display the list of products when the data is available
                   return state.products.isEmpty
-                      ? Animate(
-                          child: Center(child: Text('Cart is Empty')),
-                          effects: [ScaleEffect()],
-                        )
+                      ? Center(
+                          child: Text(
+                          'Cart is Empty',
+                          style: context.titleLarge,
+                        ))
                       : ListView.builder(
                           itemCount: state.products.length,
                           itemBuilder: (context, index) {
@@ -51,7 +53,11 @@ class HomeScreen extends StatelessWidget {
                           },
                         );
                 } else if (state is ProductErrorState) {
-                  return Text('Error loading products: ${state.error}');
+                  return Center(
+                      child: Text(
+                    'Error loading products: ${state.error}',
+                    style: context.titleLarge,
+                  ));
                 } else {
                   // Display a loading indicator or an error message when the data is not available
                   return const Center(
